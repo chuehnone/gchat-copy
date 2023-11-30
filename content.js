@@ -126,10 +126,18 @@ function inIframe () {
 function main() {
     var scrollContainer = document.querySelector('c-wiz[data-group-id][data-is-client-side] > div:nth-child(1)');
     var copyButtonInsertedCount = 0;
+
     // Iterating on threads and in the case of DMs, the whole message history is one thread
     document.querySelectorAll("c-wiz[data-topic-id][data-local-topic-id]")
         .forEach(
             function(e,t,i){
+                const roomId = inIframe()
+                    ? e.getAttribute('data-p').match(/space\/([^\\"]*)/)[1]
+                    : window.location.pathname.match(/\/room\/([^\?\/]*)/)[1];
+                if (roomId === null) {
+                    return;
+                }
+
                 var copy = e.querySelector('.gchat-xtra-copy');
                 if(e.getAttribute("data-topic-id") && !copy){
                     // Adding copy thread link buttons to thread
@@ -138,6 +146,7 @@ function main() {
                     copyButton.innerHTML = `
                         Copy thread link
                     `;
+
                     copyButton.addEventListener('click', function() {
                         const el = document.createElement('textarea');
                         const threadId = e.getAttribute("data-topic-id");
@@ -161,24 +170,11 @@ function main() {
                         }, 1000);
                     });
 
-                    var buttonContainer = e.querySelector('div[role="checkbox"] > span:first-of-type');
+                    var buttonContainer = e.querySelector('div[jsname="foTTDb"]');
                     if (
-                        buttonContainer &&
-                        buttonContainer.children.length === 2 &&
-                        buttonContainer.children[0].tagName === 'SPAN' &&
-                        buttonContainer.children[1].tagName === 'SPAN'
+                        buttonContainer
                     ) {
-                        buttonContainer.style = 'display: inline-block;';
-
-                        buttonContainer.parentElement.style = 'display: inline-block; width: unset; opacity: 1;';
-                        buttonContainer.parentElement.parentElement.appendChild(copyButton);
-
-                        // Follow button container gets hidden in channels where all notifications are enabled.
-                        // Undo that
-                        buttonContainer.parentElement.parentElement.parentElement.style += '; display: block;';
-                        copyButtonInsertedCount += 1;
-                        scrollContainer.scrollTop += 36;
-                        buttonContainer.parentElement.parentElement.parentElement.parentElement.style = 'padding-top: 56px;';
+                        buttonContainer.appendChild(copyButton);
                     }
                 }
 
