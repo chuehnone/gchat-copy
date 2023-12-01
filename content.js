@@ -131,6 +131,10 @@ function main() {
     document.querySelectorAll("c-wiz[data-topic-id][data-local-topic-id]")
         .forEach(
             function(e,t,i){
+                if (e.classList.contains('XbbXmb')) {
+                    return;
+                }
+
                 const roomId = inIframe()
                     ? e.getAttribute('data-p').match(/space\/([^\\"]*)/)[1]
                     : window.location.pathname.match(/\/room\/([^\?\/]*)/)[1];
